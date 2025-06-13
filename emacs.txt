@@ -1,0 +1,153 @@
+;; Initialize package sources
+(add-to-list 'load-path "~/.emacs.d/lisp/")
+(add-to-list 'load-path "/c/Users/rko08491/.emacs.d/lisp")
+(add-to-list 'auto-mode-alist '("\\.nesasm\\'" . nes-asm-mode))
+(add-to-list 'auto-mode-alist '("\\.asm\\'" . nes-asm-mode))
+(require 'atari8bit-mode)
+(require 'atari-gfx-mode)
+(require 'nes-asm)
+(require 'package)
+(require 'asm-mode)
+
+(setq package-archives '(("melpa" . "https://melpa.org/packages/")
+                         ("gnu" . "https://elpa.gnu.org/packages/")
+                         ("org" . "https://orgmode.org/elpa/")))
+(package-initialize)
+
+;; Install use-package for easier package management
+(unless (package-installed-p 'use-package)
+  (package-refresh-contents)
+  (package-install 'use-package))
+(require 'use-package)
+
+;; Enable line numbers like Tsoding's config
+(global-display-line-numbers-mode t)
+(setq display-line-numbers-type 'relative)
+
+(setq lsp-pylsp-server-command '("python" "-m" "pylsp"))
+
+
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ '((python . t)))
+
+
+
+;; Configure Dired for auto-completion
+(use-package dired
+  :ensure nil
+  :config
+  (setq dired-dwim-target t)
+  (setq dired-auto-revert-buffer t))
+
+;; LSP mode for multiple languages
+(use-package lsp-mode
+  :ensure t
+  :hook ((c++-mode . lsp)
+         (go-mode . lsp)
+         (python-mode . lsp)
+         (ruby-mode . lsp)
+         (bash-mode . lsp)
+         (yaml-mode . lsp)
+         (terraform-mode . lsp)
+         (js-mode . lsp)  ;; Add JavaScript support
+         (typescript-mode . lsp))  ;; Add TypeScript support
+  :commands lsp)
+
+(use-package lsp-ui
+  :ensure t
+  :commands lsp-ui-mode)
+
+(use-package company
+  :ensure t
+  :config
+  (setq company-idle-delay 0.2)
+  (setq company-minimum-prefix-length 1)
+  :hook (lsp-mode . company-mode))
+
+;; Language-specific modes
+(use-package powershell
+  :ensure t
+  :mode ("\\.ps1\\'" . powershell-mode))
+
+(use-package bash-completion
+  :ensure t
+  :hook (sh-mode . bash-completion-setup))
+
+(use-package yaml-mode
+  :ensure t
+  :mode ("\\.yml\\'" . yaml-mode))
+
+(use-package terraform-mode
+  :ensure t
+  :mode ("\\.tf\\'" . terraform-mode))
+
+;;(use-package nasm-mode
+;;  :ensure t
+;;  :mode ("\\.asm\\'" . nasm-mode))
+
+(use-package ruby-mode
+  :ensure t)
+
+(use-package generic-x
+  :ensure nil
+  :mode ("\\.awk\\'" . awk-mode))
+
+(use-package js2-mode
+  :ensure t
+  :mode ("\\.js\\'" . js2-mode)  ;; Add JavaScript mode
+  :hook (js2-mode . lsp))
+
+(use-package typescript-mode
+  :ensure t
+  :mode ("\\.ts\\'" . typescript-mode)  ;; Add TypeScript mode
+  :hook (typescript-mode . lsp))
+
+;; Development tools
+(use-package magit
+  :ensure t)
+
+(use-package flycheck
+  :ensure t
+  :init (global-flycheck-mode))
+
+(use-package projectile
+  :ensure t
+  :config
+  (projectile-mode +1)
+  (setq projectile-completion-system 'auto))
+
+(use-package yasnippet
+  :ensure t
+  :config
+  (yas-global-mode 1))
+
+;; Tsoding-inspired configurations
+(setq-default indent-tabs-mode nil)
+(setq-default tab-width 4)
+(setq-default c-basic-offset 4)
+
+;; Appearance tweaks inspired by Tsoding
+(use-package doom-themes
+  :ensure t
+  :config
+  (load-theme 'doom-one t))
+
+;; Enable Ido mode for better command-line completion
+(use-package ido
+  :ensure t
+  :config
+  (ido-mode t)
+  (ido-everywhere t)
+  (setq ido-enable-flex-matching t))
+
+;; Save customizations in a separate file
+
+(setq custom-file "~/.emacs-custom.el")
+(load custom-file 'noerror)
+
+;; Final touches
+(setq inhibit-startup-message t)
+(tool-bar-mode -1)
+(menu-bar-mode -1)
+(scroll-bar-mode -1)
